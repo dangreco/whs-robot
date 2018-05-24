@@ -74,6 +74,9 @@ public class DriverOpMode extends LinearOpMode {
         telemetry.addData("Lift Position", liftMotor.getTargetPosition());
 
     }
+    private void grab(){
+
+    }
 
     private void robotMovement() {
 
