@@ -60,6 +60,21 @@ public class DriverOpMode extends LinearOpMode {
 
     }
 
+    // Find absolute angle given x and y components of vector
+    public static double findAngle(double x, double y)
+    {
+        double angleDeg = Math.atan(Math.abs(x/y)) * 180 / PI;
+        boolean xNeg = x < 0;
+        boolean yNeg = y < 0;
+        if (xNeg && !yNeg)
+            angleDeg += 90;
+        if (xNeg && yNeg)
+            angleDeg += 180;
+        if (!xNeg && yNeg)
+            angleDeg += 270;
+        return angleDeg;
+    }
+
     private void controlLift()
     {
         // Calculate stick positioning
@@ -87,24 +102,24 @@ public class DriverOpMode extends LinearOpMode {
 
             // Calc motor power & angle
             double stickLeftMagnitude = Math.sqrt(Math.pow(stickLeftX, 2) + Math.pow(stickLeftY, 2));
-            double stickLeftAngle = Math.atan2(stickLeftX, stickLeftY) * 180 / PI + 180;
+            double stickLeftAngle = findAngle(stickLeftX, stickLeftY);
 
             // Init wheel direction modifiers
             int modFL, modFR, modBL, modBR;
             modFL = modFR = modBL = modBR = 0;
 
             // Set wheel direction modifiers
-            if (stickLeftAngle > PI / 4 && stickLeftAngle < 3 * PI / 4) {
+            if (stickLeftAngle > 45 && stickLeftAngle < 135) {
                 // Stick is up
                 modFL = modFR = modBR = modBL = 1;
-            } else if (stickLeftAngle > 3 * PI / 4 && stickLeftAngle < 5 * PI / 4) {
+            } else if (stickLeftAngle > 135 && stickLeftAngle < 225) {
                 // Stick is left
                 modFR = modBL = 1;
                 modFL = modBR = 1;
-            } else if (stickLeftAngle > 5 * PI / 4 && stickLeftAngle < 7 * PI / 4) {
+            } else if (stickLeftAngle > 225 && stickLeftAngle < 315) {
                 // Stick is down
                 modFL = modFR = modBR = modBL = -1;
-            } else if (stickLeftAngle > 7 * PI / 4 && stickLeftAngle < PI / 4) {
+            } else if (stickLeftAngle > 315 && stickLeftAngle < 45) {
                 // Stick is right
                 modFL = modBR = 1;
                 modFR = modBL = -1;
