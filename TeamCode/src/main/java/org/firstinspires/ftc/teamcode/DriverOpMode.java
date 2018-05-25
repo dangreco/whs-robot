@@ -46,12 +46,17 @@ public class DriverOpMode extends LinearOpMode {
         servoLeft = hardwareMap.servo.get("servoLeft");
         servoRight = hardwareMap.servo.get("servoRight");
 
-
+        //check directions pretty sure left has to be clockwise and right counter clockwise
+        servoLeft.setDirection(Servo.Direction.FORWARD);
+        servoRight.setDirection(Servo.Direction.REVERSE);
         waitForStart();
         while (opModeIsActive()) {
 
             robotMovement();
             controlLift();
+
+            grab();
+            release();
 
             idle();
 
@@ -87,6 +92,30 @@ public class DriverOpMode extends LinearOpMode {
 
         // Add telemetry data
         telemetry.addData("Lift Position", liftMotor.getTargetPosition());
+
+    }
+    private void grab(){
+        if(gamepad1.y) {
+            //move to position where it touches block ----might have to change angle based on trial----
+            //Drastic angles at the moment for testing
+            servoLeft.setPosition(0.5);
+            servoRight.setPosition(0.5);
+        }
+        telemetry.addData("Servo Left Position", servoLeft.getPosition());
+        telemetry.addData("Servo Right Position", servoLeft.getPosition());
+        telemetry.update();
+
+    }
+
+    public void release(){
+        if(gamepad1.x) {
+            // move to 0 degrees.
+            servoLeft.setPosition(0);
+            servoRight.setPosition(0);
+        }
+        telemetry.addData("Servo Left Position", servoLeft.getPosition());
+        telemetry.addData("Servo Right Position", servoLeft.getPosition());
+        telemetry.update();
 
     }
 
@@ -150,7 +179,7 @@ public class DriverOpMode extends LinearOpMode {
         telemetry.addData("Back Right Motor Power", motorRightBack.getPower());
         telemetry.addData("Front Left Motor Power", motorLeftFront.getPower());
         telemetry.addData("Front Right Motor Power", motorRightFront.getPower());
-
+        telemetry.update();
     }
 
 }
