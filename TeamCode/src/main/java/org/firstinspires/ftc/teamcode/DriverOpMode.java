@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "TeleOpTest")
@@ -16,8 +17,17 @@ public class DriverOpMode extends LinearOpMode {
     private DcMotor motorRightBack;
     private DcMotor liftMotor;
 
+    private Joystick joystick;
+
     private Servo servoLeft;
     private Servo servoRight;
+
+    // Config for wheel direction modifier. Goes FL, FR, BL, BR.
+    private final int[] modUP = {-1, 1, -1, 1};
+    private final int[] modDOWN = {1, -1, 1, -1};
+    private final int[] modLEFT = {1, 1, -1, -1};
+    private final int[] modRIGHT = {-1, -1, 1, 1};
+
 
     public void runOpMode() throws InterruptedException {
 
@@ -35,6 +45,8 @@ public class DriverOpMode extends LinearOpMode {
         servoLeft.setDirection(Servo.Direction.FORWARD);
         servoRight.setDirection(Servo.Direction.REVERSE);
 
+        joystick = new Joystick(gamepad1);
+
         waitForStart();
         while (opModeIsActive()) {
 
@@ -51,44 +63,6 @@ public class DriverOpMode extends LinearOpMode {
 
         }
 
-    }
-    /*
-    public void testMotorOrientation()
-    {
-        if (gamepad1.dpad_up) {
-            motorRightBack.setPower(1.0);
-        }
-        if (gamepad1.dpad_down) {
-            motorRightFront.setPower(1.0);
-        }
-        if (gamepad1.dpad_left) {
-            motorLeftBack.setPower(1.0);
-        }
-        if (gamepad1.dpad_right){
-            motorLeftFront.setPower(1.0);
-        }
-    }
-
-*/
-
-    /**
-     * Function to find the absolute angle (0-360) of vector given its components.
-     * @param x => The x component of the vector.
-     * @param y => The y component of the vector.
-     * @return The angle from 0-360deg of the vector.
-     */
-    public static double findAngle(double x, double y)
-    {
-        double angleDeg = Math.atan(Math.abs(x/y)) * 180 / PI;
-        boolean xNeg = x < 0;
-        boolean yNeg = y < 0;
-        if (xNeg && !yNeg)
-            angleDeg += 90;
-        if (xNeg && yNeg)
-            angleDeg += 180;
-        if (!xNeg && yNeg)
-            angleDeg += 270;
-        return angleDeg;
     }
 
     /**
@@ -164,31 +138,25 @@ public class DriverOpMode extends LinearOpMode {
         if (!gamepad1.left_bumper && !gamepad1.right_bumper) {
 
             /* Derive movement values from gamepad */
+            Direction direction = joystick.getDirection();
+            double power = joystick.getPower();
 
-            if (gamepad1.y) {
-                motorLeftFront.setPower(-1.0);
-                motorLeftBack.setPower(-1.0);
-                motorRightFront.setPower(1.0);
-                motorRightBack.setPower(1.0);
+            int[] modifier;
+
+            if (direction == Direction.UP) {
+                modifier = modUP;
+            } else if (direction == Direction.DOWN) {
+                modifier = modDOWN;
+            } else if (direction == Direction.RIGHT) {
+                modifier = modRIGHT;
+            } else {
+                modifier = modLEFT;
             }
-            if (gamepad1.a) {
-                motorLeftFront.setPower(1.0);
-                motorLeftBack.setPower(1.0);
-                motorRightFront.setPower(-1.0);
-                motorRightBack.setPower(-1.0);
-            }
-            if (gamepad1.b) {
-                motorLeftFront.setPower(-1.0);
-                motorLeftBack.setPower(1.0);
-                motorRightFront.setPower(-1.0);
-                motorRightBack.setPower(1.0);
-            }
-            if (gamepad1.x){
-                motorLeftFront.setPower(1.0);
-                motorLeftBack.setPower(-1.0);
-                motorRightFront.setPower(1.0);
-                motorRightBack.setPower(-1.0);
-            }
+
+            motorLeftFront.setPower(modifier[0] * power);
+            motorRightFront.setPower(modifier[1] * power);
+            motorLeftBack.setPower(modifier[2] * power);
+            motorRightBack.setPower(modifier[3] * power);
 
 
         } else {
@@ -210,6 +178,42 @@ public class DriverOpMode extends LinearOpMode {
         telemetry.addData("Back Right Motor Power", motorRightBack.getPower());
         telemetry.addData("Front Left Motor Power", motorLeftFront.getPower());
         telemetry.addData("Front Right Motor Power", motorRightFront.getPower());
+    }
+
+    private enum Direction {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    }
+
+    private static class Joystick {
+
+        private Gamepad gamepad;
+        private static final double MIN_MAGNITUDE = 0.3;
+        private static final double MAX_MAGNITUDE = 1.0;
+
+        public Joystick(Gamepad gamepad)
+        {
+            this.gamepad = gamepad;
+        }
+
+        public Direction getDirection()
+        {
+            double angle = Math.toDegrees(Math.atan2(-gamepad.left_stick_y, gamepad.left_stick_x));
+            double angleFixed = angle < 0 ? 180.0 + (180 - Math.abs(angle)) : angle;
+            if (angleFixed >= 45 && angleFixed < 135) return Direction.UP;
+            if (angleFixed >= 135 && angleFixed < 225) return Direction.LEFT;
+            if (angleFixed >= 225 && angleFixed < 315) return Direction.DOWN;
+            return Direction.RIGHT;
+        }
+
+        public double getPower()
+        {
+            double pow = ((Math.abs(Math.sqrt(Math.pow(gamepad.left_stick_x, 2) + Math.pow(-gamepad.left_stick_y, 2))) - MIN_MAGNITUDE) / (MAX_MAGNITUDE - MIN_MAGNITUDE));
+            return pow > 1.0 ? 1.0 : pow;
+        }
+
     }
 
 }
