@@ -22,10 +22,10 @@ public class DriverOpMode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         /* Initialize motors */
-        motorLeftFront = hardwareMap.dcMotor.get("motorLeftFront");
-        motorLeftBack = hardwareMap.dcMotor.get("motorLeftBack");
-        motorRightFront = hardwareMap.dcMotor.get("motorRightFront");
-        motorRightBack = hardwareMap.dcMotor.get("motorRightBack");
+        motorLeftFront = hardwareMap.dcMotor.get("motorLF");
+        motorLeftBack = hardwareMap.dcMotor.get("motorLB");
+        motorRightFront = hardwareMap.dcMotor.get("motorRF");
+        motorRightBack = hardwareMap.dcMotor.get("motorRB");
         liftMotor = hardwareMap.dcMotor.get("liftMotor");
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         servoLeft = hardwareMap.servo.get("servoLeft");
@@ -43,6 +43,7 @@ public class DriverOpMode extends LinearOpMode {
             controlLift();
             testGrab();
             testRelease();
+            //testMotorOrientation();
 
             /* Update telemetry and wait for hardware thread to catch up */
             telemetry.update();
@@ -51,6 +52,24 @@ public class DriverOpMode extends LinearOpMode {
         }
 
     }
+    /*
+    public void testMotorOrientation()
+    {
+        if (gamepad1.dpad_up) {
+            motorRightBack.setPower(1.0);
+        }
+        if (gamepad1.dpad_down) {
+            motorRightFront.setPower(1.0);
+        }
+        if (gamepad1.dpad_left) {
+            motorLeftBack.setPower(1.0);
+        }
+        if (gamepad1.dpad_right){
+            motorLeftFront.setPower(1.0);
+        }
+    }
+
+*/
 
     /**
      * Function to find the absolute angle (0-360) of vector given its components.
@@ -128,6 +147,14 @@ public class DriverOpMode extends LinearOpMode {
         telemetry.addData("Servo Right Position", servoLeft.getPosition());
     }
 
+    public void setToZero()
+    {
+        motorLeftFront.setPower(0);
+        motorLeftBack.setPower(0);
+        motorRightFront.setPower(0);
+        motorRightBack.setPower(0);
+    }
+
     /**
      * Function to control the rotation and physical movement of robot.
      */
@@ -137,36 +164,32 @@ public class DriverOpMode extends LinearOpMode {
         if (!gamepad1.left_bumper && !gamepad1.right_bumper) {
 
             /* Derive movement values from gamepad */
-            float stickLeftX = gamepad1.left_stick_x;
-            float stickLeftY = -gamepad1.left_stick_y;
-            double stickLeftMagnitude = Math.sqrt(Math.pow(stickLeftX, 2) + Math.pow(stickLeftY, 2));
-            double stickLeftAngle = findAngle(stickLeftX, stickLeftY);
 
-            /* Modify wheel power by direction of stick (90deg intervals) */
-            int modFL, modFR, modBL, modBR;
-            modFL = modFR = modBL = modBR = 0;
-
-            if (inRange(stickLeftAngle, 45, 135)) {
-                /* Up */
-                modFL = modFR = modBR = modBL = 1;
-            } else if (inRange(stickLeftAngle, 135, 225)) {
-                /* Left */
-                modFR = modBL = 1;
-                modFL = modBR = -1;
-            } else if (inRange(stickLeftAngle, 225, 315)) {
-                /* Down */
-                modFL = modFR = modBR = modBL = -1;
-            } else if (inRange(stickLeftAngle, 315, 45)) {
-                /* Right */
-                modFL = modBR = 1;
-                modFR = modBL = -1;
+            if (gamepad1.y) {
+                motorLeftFront.setPower(-1.0);
+                motorLeftBack.setPower(-1.0);
+                motorRightFront.setPower(1.0);
+                motorRightBack.setPower(1.0);
+            }
+            if (gamepad1.a) {
+                motorLeftFront.setPower(1.0);
+                motorLeftBack.setPower(1.0);
+                motorRightFront.setPower(-1.0);
+                motorRightBack.setPower(-1.0);
+            }
+            if (gamepad1.b) {
+                motorLeftFront.setPower(-1.0);
+                motorLeftBack.setPower(1.0);
+                motorRightFront.setPower(-1.0);
+                motorRightBack.setPower(1.0);
+            }
+            if (gamepad1.x){
+                motorLeftFront.setPower(1.0);
+                motorLeftBack.setPower(-1.0);
+                motorRightFront.setPower(1.0);
+                motorRightBack.setPower(-1.0);
             }
 
-            /* Set motor power */
-            motorLeftFront.setPower(modFL * stickLeftMagnitude);
-            motorRightFront.setPower(modFR * stickLeftMagnitude);
-            motorLeftBack.setPower(modBL * stickLeftMagnitude);
-            motorRightBack.setPower(modBR * stickLeftMagnitude);
 
         } else {
 
