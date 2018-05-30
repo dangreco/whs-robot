@@ -43,7 +43,7 @@ public class DriverOpMode extends LinearOpMode {
 
         /* TODO: Check directions; pretty sure left has to be clockwise and right counter clockwise */
         servoLeft.setDirection(Servo.Direction.FORWARD);
-        servoRight.setDirection(Servo.Direction.REVERSE);
+        servoRight.setDirection(Servo.Direction.FORWARD);
 
         joystick = new Joystick(gamepad1);
 
@@ -118,7 +118,7 @@ public class DriverOpMode extends LinearOpMode {
             servoRight.setPosition(0);
         }
         telemetry.addData("Servo Left Position", servoLeft.getPosition());
-        telemetry.addData("Servo Right Position", servoLeft.getPosition());
+        telemetry.addData("Servo Right Position", servoRight.getPosition());
     }
 
     public void setMotorPowerToZero()
