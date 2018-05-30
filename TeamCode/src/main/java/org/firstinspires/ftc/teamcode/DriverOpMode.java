@@ -121,7 +121,7 @@ public class DriverOpMode extends LinearOpMode {
         telemetry.addData("Servo Right Position", servoLeft.getPosition());
     }
 
-    public void setToZero()
+    public void setMotorPowerToZero()
     {
         motorLeftFront.setPower(0);
         motorLeftBack.setPower(0);
@@ -137,27 +137,32 @@ public class DriverOpMode extends LinearOpMode {
         /* If it will be rotating, don't drive */
         if (!gamepad1.left_bumper && !gamepad1.right_bumper) {
 
-            /* Derive movement values from gamepad */
-            Direction direction = joystick.getDirection();
-            double power = joystick.getPower();
+            if (joystick.shouldMove()) {
 
-            int[] modifier;
+                /* Derive movement values from gamepad */
+                Direction direction = joystick.getDirection();
+                double power = joystick.getPower();
 
-            if (direction == Direction.UP) {
-                modifier = modUP;
-            } else if (direction == Direction.DOWN) {
-                modifier = modDOWN;
-            } else if (direction == Direction.RIGHT) {
-                modifier = modRIGHT;
+                int[] modifier;
+
+                if (direction == Direction.UP) {
+                    modifier = modUP;
+                } else if (direction == Direction.DOWN) {
+                    modifier = modDOWN;
+                } else if (direction == Direction.RIGHT) {
+                    modifier = modRIGHT;
+                } else {
+                    modifier = modLEFT;
+                }
+
+                motorLeftFront.setPower(modifier[0] * power);
+                motorRightFront.setPower(modifier[1] * power);
+                motorLeftBack.setPower(modifier[2] * power);
+                motorRightBack.setPower(modifier[3] * power);
+
             } else {
-                modifier = modLEFT;
+                setMotorPowerToZero();
             }
-
-            motorLeftFront.setPower(modifier[0] * power);
-            motorRightFront.setPower(modifier[1] * power);
-            motorLeftBack.setPower(modifier[2] * power);
-            motorRightBack.setPower(modifier[3] * power);
-
 
         } else {
 
@@ -196,6 +201,12 @@ public class DriverOpMode extends LinearOpMode {
         public Joystick(Gamepad gamepad)
         {
             this.gamepad = gamepad;
+        }
+
+        public boolean shouldMove()
+        {
+            double mag = Math.abs(Math.sqrt(Math.pow(gamepad.left_stick_x, 2) + Math.pow(-gamepad.left_stick_y, 2)));
+            return mag > MIN_MAGNITUDE;
         }
 
         public Direction getDirection()
