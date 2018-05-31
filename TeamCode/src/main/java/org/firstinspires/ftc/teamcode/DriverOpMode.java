@@ -27,6 +27,8 @@ public class DriverOpMode extends LinearOpMode {
     private final int[] modLEFT = {1, 1, -1, -1};
     private final int[] modRIGHT = {-1, -1, 1, 1};
 
+    private int frontInc = 0;
+    private int backInc = 0;
 
     public void runOpMode() throws InterruptedException {
 
@@ -69,13 +71,13 @@ public class DriverOpMode extends LinearOpMode {
      */
     private void controlLift()
     {
-        /* Calculate stick positioning */
-        int liftPosition = liftMotor.getCurrentPosition();
-        double speed = Math.abs(gamepad1.right_stick_y);
-        int direction = gamepad1.right_stick_y < 0 ? 1 : -1;
-
-        /* Move lift */
-        liftMotor.setTargetPosition(liftPosition + (int)Math.round(10 * speed * direction));
+       if (gamepad1.dpad_up) {
+           liftMotor.setPower(-0.5);
+       } else if (gamepad1.dpad_down) {
+           liftMotor.setPower(0.5);
+       } else {
+           liftMotor.setPower(0);
+       }
     }
 
     /**
@@ -89,6 +91,26 @@ public class DriverOpMode extends LinearOpMode {
             servoLeft.setPosition(0.5);
             servoRight.setPosition(0.5);
         }
+    }
+
+    private void powerChange()
+    {
+        if (gamepad1.left_bumper) {
+            ++backInc;
+            if (backInc > 20) backInc = 20;
+        } else if (gamepad1.left_trigger > 0.75) {
+            --backInc;
+            if (backInc < 0) backInc = 0;
+        }
+
+        if (gamepad1.right_bumper) {
+            ++frontInc;
+            if (frontInc > 20) frontInc = 20;
+        } else if (gamepad1.right_trigger > 0.75) {
+            --frontInc;
+            if (frontInc < 0) frontInc = 0;
+        }
+
     }
 
     /**
@@ -140,10 +162,10 @@ public class DriverOpMode extends LinearOpMode {
                     modifier = modLEFT;
                 }
 
-                motorLeftFront.setPower(modifier[0] * power);
-                motorRightFront.setPower(modifier[1] * power);
-                motorLeftBack.setPower(modifier[2] * power);
-                motorRightBack.setPower(modifier[3] * power);
+                motorLeftFront.setPower(modifier[0] * ((power * 0.8) + (0.01 * frontInc)));
+                motorRightFront.setPower(modifier[1] * ((power * 0.8) + (0.01 * frontInc)));
+                motorLeftBack.setPower(modifier[2] * ((power * 0.8) + (0.01 * backInc)));
+                motorRightBack.setPower(modifier[3] * ((power * 0.8) + (0.01 * backInc)));
 
             } else {
                 setMotorPowerToZero();
