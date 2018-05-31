@@ -155,14 +155,13 @@ public class DriverOpMode extends LinearOpMode {
             Joystick.Direction d = joystick.getRightDirection();
             double power = joystick.getRightPower();
             boolean left = d == Joystick.Direction.LEFT;
-            double leftMod = left ? -1 : 1;
-            double rightMod = left ? 1 : -1;
+            double sideMod = left ? 1 : -1;
 
             /* Set motor power */
-            motorLeftFront.setPower(leftMod * power);
-            motorLeftBack.setPower(leftMod * power);
-            motorRightFront.setPower(rightMod * power);
-            motorRightBack.setPower(rightMod * power);
+            motorLeftFront.setPower(sideMod * power);
+            motorLeftBack.setPower(sideMod * power);
+            motorRightFront.setPower(sideMod * power);
+            motorRightBack.setPower(sideMod * power);
 
         }
 
