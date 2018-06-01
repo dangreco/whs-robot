@@ -18,7 +18,7 @@ public class DriverOpMode extends LinearOpMode {
     private Joystick joystick;
 
     private Servo servoLeft;
-    //private Servo servoRight;
+    private Servo servoRight;
 
     // DO NOT MESS WITH THESE VALUES UNLESS YOU ARE DAN OR ME ..... PRANKED -RISHABH
 
@@ -43,13 +43,13 @@ public class DriverOpMode extends LinearOpMode {
         liftMotor = hardwareMap.dcMotor.get("liftMotor");
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         servoLeft = hardwareMap.servo.get("servoLeft");
-        //servoRight = hardwareMap.servo.get("servoRight");
+        servoRight = hardwareMap.servo.get("servoRight");
 
         /* TODO: Check directions; pretty sure left has to be clockwise and right counter clockwise */
         servoLeft.setDirection(Servo.Direction.FORWARD);
-        //servoRight.setDirection(Servo.Direction.FORWARD);
+        servoRight.setDirection(Servo.Direction.FORWARD);
         servoLeft.setPosition(0);
-
+        servoRight.setPosition(0);
         joystick = new Joystick(gamepad1);
 
         waitForStart();
@@ -74,10 +74,19 @@ public class DriverOpMode extends LinearOpMode {
 
     private void testServo(){
         //servo position ranges from 0-1
-        if(gamepad1.y) {
-            servoLeft.setPosition(.5);
+
+        if (gamepad1.y) {
             servoLeft.setDirection(Servo.Direction.REVERSE);
-            servoLeft.setPosition(.5);
+            servoLeft.setPosition(0.5);
+            servoRight.setDirection(Servo.Direction.REVERSE);
+            servoRight.setPosition(0.5);
+
+        }
+        if (gamepad1.x) {
+            servoLeft.setDirection(Servo.Direction.FORWARD);
+            servoLeft.setPosition(0.1);
+            servoRight.setDirection(Servo.Direction.FORWARD);
+            servoRight.setPosition(0.1);
         }
         //Should theoretically move the servo back and forth
 
@@ -92,7 +101,7 @@ public class DriverOpMode extends LinearOpMode {
            liftMotor.setPower(-0.5);
        } else if (gamepad1.dpad_down) {
            liftMotor.setPower(0.5);
-       } else {
+       } else {++backInc;
            liftMotor.setPower(0);
        }
     }
@@ -100,6 +109,7 @@ public class DriverOpMode extends LinearOpMode {
     /**
      * Check if claw needs to grab.
      */
+          // liftMotor.setPower(0);
     private void testGrab()
     {
         if(gamepad1.y) {
@@ -140,7 +150,7 @@ public class DriverOpMode extends LinearOpMode {
             servoLeft.setPosition(0);
             //servoRight.setPosition(0);
         }
-        telemetry.addData("Servo Left Position", servoLeft.getPosition());
+        telemetry.addData("Servo Left Posit++backInc;ion", servoLeft.getPosition());
         //telemetry.addData("Servo Right Position", servoRight.getPosition());
     }
 
