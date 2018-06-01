@@ -18,9 +18,12 @@ public class DriverOpMode extends LinearOpMode {
     private Joystick joystick;
 
     private Servo servoLeft;
-    private Servo servoRight;
+    //private Servo servoRight;
 
-    // DO NOT MESS WITH THESE VALUES UNLESS YOU ARE DAN
+    // DO NOT MESS WITH THESE VALUES UNLESS YOU ARE DAN OR ME ..... PRANKED -RISHABH
+
+    //LA DI DA DI DAAA SHLOB ON ME KNOB, PASS ME THE SYRUP...
+
     // Config for wheel direction modifier. Goes FL, FR, BL, BR.
     private final int[] modUP = {-1, 1, -1, 1};
     private final int[] modDOWN = {1, -1, 1, -1};
@@ -40,11 +43,12 @@ public class DriverOpMode extends LinearOpMode {
         liftMotor = hardwareMap.dcMotor.get("liftMotor");
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         servoLeft = hardwareMap.servo.get("servoLeft");
-        servoRight = hardwareMap.servo.get("servoRight");
+        //servoRight = hardwareMap.servo.get("servoRight");
 
         /* TODO: Check directions; pretty sure left has to be clockwise and right counter clockwise */
         servoLeft.setDirection(Servo.Direction.FORWARD);
-        servoRight.setDirection(Servo.Direction.FORWARD);
+        //servoRight.setDirection(Servo.Direction.FORWARD);
+        servoLeft.setPosition(0);
 
         joystick = new Joystick(gamepad1);
 
@@ -54,15 +58,28 @@ public class DriverOpMode extends LinearOpMode {
             /* Test for button presses and move motors */
             robotMovement();
             controlLift();
-            testGrab();
-            testRelease();
+            //testGrab();
+            //testRelease();
             //testMotorOrientation();
+            testServo();
 
             /* Update telemetry and wait for hardware thread to catch up */
             telemetry.update();
             idle();
 
         }
+
+    }
+
+
+    private void testServo(){
+        //servo position ranges from 0-1
+        if(gamepad1.y) {
+            servoLeft.setPosition(.5);
+            servoLeft.setDirection(Servo.Direction.REVERSE);
+            servoLeft.setPosition(.5);
+        }
+        //Should theoretically move the servo back and forth
 
     }
 
@@ -89,7 +106,7 @@ public class DriverOpMode extends LinearOpMode {
             //move to position where it touches block ----might have to change angle based on trial----
             //Drastic angles at the moment for testing
             servoLeft.setPosition(0.5);
-            servoRight.setPosition(0.5);
+            //servoRight.setPosition(0.5);
         }
     }
 
@@ -121,10 +138,10 @@ public class DriverOpMode extends LinearOpMode {
         if(gamepad1.x) {
             // move to 0 degrees.
             servoLeft.setPosition(0);
-            servoRight.setPosition(0);
+            //servoRight.setPosition(0);
         }
         telemetry.addData("Servo Left Position", servoLeft.getPosition());
-        telemetry.addData("Servo Right Position", servoRight.getPosition());
+        //telemetry.addData("Servo Right Position", servoRight.getPosition());
     }
 
     public void setMotorPowerToZero()
